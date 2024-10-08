@@ -6891,9 +6891,9 @@ importers:
 
   components/overledger:
     specifiers:
-      '@pipedream/platform': ^1.5.1
+      '@pipedream/platform': ^3.0.3
     dependencies:
-      '@pipedream/platform': 1.6.4
+      '@pipedream/platform': 3.0.3
 
   components/overloop:
     specifiers:
