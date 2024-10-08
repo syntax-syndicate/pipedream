@@ -1,5 +1,5 @@
-import overledger from "../../overledger.app.mjs";
 import { UNIT_OPTIONS } from "../../common/constants.mjs";
+import overledger from "../../overledger.app.mjs";
 
 export default {
   key: "overledger-sign-smart-contract-transaction",
@@ -9,6 +9,12 @@ export default {
   type: "action",
   props: {
     overledger,
+    environment: {
+      propDefinition: [
+        overledger,
+        "environment",
+      ],
+    },
     keyId: {
       type: "string",
       label: "Signing Account ID",
@@ -64,6 +70,7 @@ export default {
 
     const response = await this.overledger.signTransaction({
       $,
+      environment: this.environment,
       data: requestBody,
     });
     $.export("$summary", "Transaction signed successfully");

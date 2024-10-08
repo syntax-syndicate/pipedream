@@ -1,27 +1,17 @@
 import { axios } from "@pipedream/platform";
+import { ENVIRONMENT_OPTIONS } from "./common/constants.mjs";
 
 export default {
   type: "app",
   app: "overledger",
-  props: { //Options to allow for instance selection of Overledger environment - Sandbox or Live Overledger to determine BaseURL
-    environment: {
+  propDefinitions: {
+    environment: { //Options to allow for instance selection of Overledger environment - Sandbox or Live Overledger to determine BaseURL
       type: "string",
       label: "Overledger Instance",
       description: "Select the Overledger environment.",
-      options: [
-        {
-          label: "Sandbox",
-          value: "sandbox",
-        },
-        {
-          label: "Overledger",
-          value: "overledger",
-        },
-      ],
-      optional: false,
+      options: ENVIRONMENT_OPTIONS,
+      default: "overledger",
     },
-  },
-  propDefinitions: {
     smartContractId: {
       type: "string",
       label: "Smart Contract ID",
@@ -36,24 +26,23 @@ export default {
         "API-Version": "3.0.0",
       };
     },
-    _getBaseUrl() { //conditional for environment url selection.
-      return this.environment === "sandbox"
+    _getBaseUrl(environment) { //conditional for environment url selection.
+      return environment === "sandbox"
         ? "https://api.sandbox.overledger.io"
         : "https://api.overledger.io";
     },
     _makeRequest({
-      $ = this, baseUrl, path, ...otherOpts
+      $ = this, path, environment, ...otherOpts
     }) {
       return axios($, {
         ...otherOpts,
-        url: baseUrl + path,
+        url: this._getBaseUrl(environment) + path,
         headers: this._headers(),
       });
     },
     prepareSmartContractTransaction(opts = {}) {
       return this._makeRequest({
         method: "POST",
-        baseUrl: this._getBaseUrl(),
         path: "/api/preparations/transactions/smart-contracts/write",
         ...opts,
       });
@@ -61,7 +50,6 @@ export default {
     readFromSmartContract(opts = {}) {
       return this._makeRequest({
         method: "POST",
-        baseUrl: this._getBaseUrl(),
         path: "/api/smart-contracts/read",
         ...opts,
       });
@@ -69,7 +57,6 @@ export default {
     signTransaction(opts = {}) {
       return this._makeRequest({
         method: "POST",
-        baseUrl: this._getBaseUrl(),
         path: "/api/transaction-signing-sandbox",
         ...opts,
       });
@@ -77,7 +64,6 @@ export default {
     executeSignedTransaction(opts = {}) {
       return this._makeRequest({
         method: "POST",
-        baseUrl: this._getBaseUrl(),
         path: "/api/executions/transactions",
         ...opts,
       });
@@ -87,18 +73,17 @@ export default {
     }) {
       return this._makeRequest({
         method: "POST",
-        baseUrl: this._getBaseUrl(),
         path: `/api/webhooks/${path}`,
         ...opts,
       });
     },
     deleteHook({
-      path, webhookId,
+      path, webhookId, ...opts
     }) {
       return this._makeRequest({
         method: "DELETE",
-        baseUrl: this._getBaseUrl(),
         path: `/api/webhooks/${path}/${webhookId}`,
+        ...opts,
       });
     },
   },

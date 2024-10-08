@@ -8,10 +8,16 @@ export default {
   key: "overledger-prepare-smart-contract-transaction",
   name: "Prepare Smart Contract Transaction",
   description: "Prepares a smart contract transaction for signing on the Overledger platform. [See the documentation](https://developers.quant.network/reference/preparesmartcontractwrite)",
-  version: "0.0.1",
+  version: "0.0.2",
   type: "action",
   props: {
     overledger,
+    environment: {
+      propDefinition: [
+        overledger,
+        "environment",
+      ],
+    },
     locationTechnology: {
       type: "string",
       label: "Location Technology",
@@ -68,6 +74,7 @@ export default {
 
     const response = await this.overledger.prepareSmartContractTransaction({
       $,
+      environment: this.environment,
       data: requestBody,
     });
     $.export("$summary", "Smart contract transaction prepared successfully");

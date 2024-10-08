@@ -11,6 +11,12 @@ export default {
       type: "$.interface.http",
       customResponse: true,
     },
+    environment: {
+      propDefinition: [
+        overledger,
+        "environment",
+      ],
+    },
     locationTechnology: {
       type: "string",
       label: "Location Technology",
@@ -34,6 +40,7 @@ export default {
   hooks: {
     async activate() {
       const response = await this.overledger.createHook({
+        environment: this.environment,
         path: this.getPath(),
         data: {
           location: {
@@ -49,6 +56,7 @@ export default {
     async deactivate() {
       const webhookId = this.db.get("webhookId");
       await this.overledger.deleteHook({
+        environment: this.environment,
         path: this.getPath(),
         webhookId,
       });

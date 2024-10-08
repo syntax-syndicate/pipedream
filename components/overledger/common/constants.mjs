@@ -1,3 +1,14 @@
+export const ENVIRONMENT_OPTIONS = [
+  {
+    label: "Sandbox",
+    value: "sandbox",
+  },
+  {
+    label: "Overledger",
+    value: "overledger",
+  },
+];
+
 export const TECHNOLOGY_OPTIONS = [
   {
     label: "Ethereum",
