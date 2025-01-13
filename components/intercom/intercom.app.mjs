@@ -8,14 +8,15 @@ export default {
       type: "string[]",
       label: "Users",
       description: "Users to watch for new events",
-      async options() {
-        const data = {
+      async options({
+        data = {
           query: {
             field: "role",
             operator: "=",
             value: "user",
           },
-        };
+        },
+      }) {
         const results = await this.searchContacts(data);
         return results.map((user) => ({
           label: user.name || user.id,
@@ -27,6 +28,60 @@ export default {
       type: "string",
       label: "Body",
       description: "The text of the note.",
+    },
+    tagId: {
+      type: "string",
+      label: "Tag ID",
+      description: "The unique identifier for the tag which is given by Intercom. Eg. `7522907`.",
+      async options() {
+        const { data: tags } = await this.listTags();
+        return tags.map(({
+          id: value, name: label,
+        }) => ({
+          label,
+          value,
+        }));
+      },
+    },
+    conversationId: {
+      type: "string",
+      label: "Conversation ID",
+      description: "The Intercom provisioned identifier for the conversation or the string `last` to reply to the last part of the conversation.",
+      async options({
+        data = {
+          query: {
+            field: "source.type",
+            operator: "=",
+            value: "conversation",
+          },
+        },
+      }) {
+        const results = await this.searchConversations(data);
+        return results.map((conversation) => ({
+          label: conversation.title || conversation.id,
+          value: conversation.id,
+        }));
+      },
+    },
+    messageType: {
+      type: "string",
+      label: "Message Type",
+      description: "The kind of message being created.",
+      options({ type = "user" }) {
+        if (type === "user") {
+          return [
+            "comment",
+          ];
+        }
+
+        if (type === "admin") {
+          return [
+            "comment",
+            "note",
+          ];
+        }
+        return [];
+      },
     },
   },
   methods: {
@@ -245,6 +300,14 @@ export default {
         data,
         $,
       });
+    },
+    listTags() {
+      return this.makeRequest({
+        endpoint: "tags",
+      });
+    },
+    async searchTickets(data) {
+      return this.paginate("tickets", "POST", data, true);
     },
   },
 };
